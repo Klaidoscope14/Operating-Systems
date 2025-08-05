@@ -1,0 +1,13 @@
+# macOS system files
+.DS_Store
+
+# Compiled binaries and object files
+*.bin
+*.elf
+*.o
+*.img
+
+# Other temporary or build files
+*.log
+*.out
+*.tmp
