@@ -1,0 +1,23 @@
+  912  sed '1 , 7/s/HR/Human Resources/g' sed_input.txt
+  913  sed '1,7/s/HR/Human Resources/g' sed_input.txt
+  914  sed -n '3,6p' sed_input.txt
+  915  sed 's/$/ - Verified/' sed_input.txt
+  916  sed's/Finance/Fin/' sed_input.txt
+  917  sed 's/Finance/Fin/' sed_input.txt
+  918  dos2unix sed_input.txt
+  919  sed 's/^/ - Verified/' sed_input.txt
+  920  sed 's/^/Verified - /' sed_input.txt
+  921  sed -n 'Finance/p' sed_input.txt
+  922  sed -n '/Finance/p' sed_input.txt
+  923  sed '/Marketing/ s/Marketing Department/\U&/' sed_input.txt
+  924  sed '4s/Neha Patel/Neha P./' sed
+  925  sed '4s/Neha Patel/Neha P./' sed_input.txt
+  926  sed 's/ - /: /g' sed
+  927  sed 's/ - /: /g' sed_input.txt
+  928  sed '$d' sed
+  929  sed '$d' sed_input.txt
+  930  sed 'HR/p/' sed_input.txt
+  931  sed '/HR/p' sed_input.txt
+  932  sed '/HR/ s/Monday/Tuesday' sed_input.txt
+  933  sed 'HR/ s/Monday/Tuesday' sed_input.txt
+  934  history

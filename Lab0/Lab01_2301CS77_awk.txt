@@ -1,0 +1,37 @@
+875  cd DEsktop
+  876  cd Desktop
+  877  gedit awk_input.txt
+  878  gedit awk_output.txt
+  879  awk -F, '{ print $2 , $4 }' awk_input.txt
+  880  awk -F, '$3 == "IT" {print} ' awk_input.txt
+  881  awk -F, '$3 == "IT" {print} ' awk_input.txt > ans.txt
+  882  awk -F, '$4 > 6000 {print} ' awk_input.txt > ans.txt
+  883  awk -F, '$4 > 6000 {print} ' awk_input.txt
+  884  awk -F, '{sum += $4} END {print "Total Salary" sum} ' awk_input.txt
+  885  awk -F, '{sum += $4} END {print "Total Salary " sum} ' awk_input.txt
+  886  awk -F, '{sum += $4} END {print "Total Salary = " sum} ' awk_input.txt
+  887  awk -F, '{sum += $4;count++} END {print "Average Salary = " sum/count} ' awk_input.txt
+  888  awk -F, '{sum += $4;count++} END {print "Average Salary = " sum/count} ' awk_input.txt > ans.txt
+  889  awk -F, 'NR == 1 {max = $4 ; maxname = $2} $4>max {max = $4 ; maxname = $2} END {print "MaxSalary :" maxname , max}' awk_input.txt > ans.txt
+  890  awk -F, 'NR == 1 {max = $4 ; maxname = $2} $4>max {max = $4 ; maxname = $2} END {print "MaxSalary :" maxname , max}' awk_input.txt 
+  891  awk -F, 'NR == 2 {max = $4 ; maxname = $2} $4>max {max = $4 ; maxname = $2} END {print "MaxSalary :" maxname , max}' awk_input.txt 
+  892  awk -F, 'NR == 2 {max = $4 ; maxname = $2} $4>max {max = $4 ; maxname = $2} END {print "MaxSalary :" maxname , max}' awk_input.txt > ans.txt
+  893  awk -F, '$5 > 5 {print $2 , $5}' awk_input.txt
+  894  awk -F{ dept[$3
+  895  awk -F{ dept[$3++] } END { for (d in dept) print d , dept[d] }' awk_input.txt
+  896  awk -F '{ dept[$3++] } END { for (d in dept) print d , dept[d] }' awk_input.txt
+  897  awk -F, -v OFS = ',' '{print $2 , $4}'  awk_input.txt
+  898  awk -F, -v OFS = "," '{print $2 , $4}'  awk_input.txt
+  899  awk -F, -v OFS = "," '{print $2 , $4}' awk_input.txt
+  900  awk -F, -v OFS = "," 'END {print $2 , $4}' awk_input.txt
+  901  awk -F '{gsub ("Finance , "Fin" , $3):print $0}' awk_input.txt
+  902  awk -F, '{gsub ("Finance , "Fin" , $3):print $0}' awk_input.txt
+  903  awk -F, '{gsub ("Finance , "Fin" , $3) print $0}' awk_input.txt
+  904  awk -F, '{gsub ("Finance , "Fin" , $3){ print $0}}' awk_input.txt
+  905  awk -F, 'gsub ("Finance , "Fin" , $3){ print $0}' awk_input.txt
+  906  awk -F ,'{print $NF}' awk_input.txt
+  907  awk -F, '{print $NF}' awk_input.txt
+  908  awk -F , '$4>= 50000 && $4<=60000 {print $2 , $4}' awk_input.txt
+  909  awk -F , '$5 == 6 { print $2 , $5 }' awk_input.txt
+  910  awk -F 'NR >1 {print $3 }' awk_input.txt | sort | uniq
+  911  awk -F, 'NR >1 {print $3 }' awk_input.txt | sort | uniq
