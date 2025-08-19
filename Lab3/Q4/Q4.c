@@ -17,6 +17,7 @@ static void child_even(void){
     }
     _exit(0);
 }
+
 static void child_odd(void){
     raise(SIGSTOP);
     for (int i = 1; i < 16; i += 2) {
@@ -26,6 +27,7 @@ static void child_odd(void){
     }
     _exit(0);
 }
+
 static void child_chars(void){
     raise(SIGSTOP);
     for (char c = 'A'; c <= 'J'; ++c) {
