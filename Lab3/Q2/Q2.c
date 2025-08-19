@@ -8,7 +8,10 @@ int main(void) {
     printf("PREFORK");  
 
     pid_t child1 = fork();
-    if (child1 < 0) { perror("fork"); return 1; }
+    if (child1 < 0) { 
+        perror("fork"); 
+        return 1; 
+    }
 
     int is_parent = 0, is_child1 = 0, is_child2 = 0;
     pid_t child2 = -1;
