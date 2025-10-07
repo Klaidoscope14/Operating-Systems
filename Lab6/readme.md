@@ -125,14 +125,6 @@ macOS marks `sem_init()` and `sem_destroy()` as deprecated. You can safely ignor
 
 ---
 
-### 👨‍💻 Author
-
-**Chaitanya Saagar**
-5th Semester — Operating Systems Laboratory
-Department of Information Technology
-
----
-
 ### 🏁 Run Summary
 
 | Program | Priority Model      | Duration | Stop      |
