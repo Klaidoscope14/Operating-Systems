@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import argparse, logging, traceback, sys, copy
 from collections import defaultdict, deque
 import pandas as pd
