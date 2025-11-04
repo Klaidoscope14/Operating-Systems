@@ -12,12 +12,10 @@
 
 #define PAGE_SIZE 4096
 
-/* Metadata kept outside the 4KB page */
-
 /* Free block node */
 typedef struct FreeNode {
-    size_t offset;           // offset from page_base
-    size_t size;             // size of free block
+    size_t offset;          
+    size_t size;           
     struct FreeNode *next;
 } FreeNode;
 
