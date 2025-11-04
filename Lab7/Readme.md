@@ -95,29 +95,3 @@ Simulation complete.
 
 * Language: **C (GCC)**
 * Libraries: `pthread.h`, `semaphore.h`, `unistd.h`, `stdlib.h`, `stdio.h`
-
----
-
-## 🧑‍💻 Author
-
-**Chaitanya Saagar**
-Operating Systems Laboratory — Assignment 07
-Department of Information Technology
-
----
-
-## 🏁 Submission Notes
-
-* Ensure both C files compile successfully.
-* Include screenshots or logs of output for verification.
-* Maintain proper indentation and comments.
-
----
-
-### 🏷️ Files Included
-
-| File                    | Description                                     |
-| ----------------------- | ----------------------------------------------- |
-| `dining_philosophers.c` | Simulation with deadlock detection and recovery |
-| `bankers_algorithm.c`   | Multithreaded Banker’s Algorithm implementation |
-| `README.md`             | This documentation file                         |
