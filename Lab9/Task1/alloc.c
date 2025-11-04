@@ -1,4 +1,3 @@
-#define _POSIX_C_SOURCE 200112L
 #include "alloc.h"
 #include <sys/mman.h>
 #include <unistd.h>
@@ -6,6 +5,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+
+#ifndef MAP_ANONYMOUS
+#define MAP_ANONYMOUS MAP_ANON
+#endif
 
 #define PAGE_SIZE 4096
 
@@ -45,14 +48,10 @@ static void add_free_block(size_t offset, size_t size) {
     node->next = *pp;
     *pp = node;
 
-    // coalesce with previous and next if adjacent
-    // coalesce previous
-    // find previous node if any
-    FreeNode *prev = NULL;
+    // coalesce adjacent free nodes
     FreeNode *cur = free_list;
     while (cur && cur->next) {
         if (cur->offset + cur->size == cur->next->offset) {
-            // merge cur and cur->next
             FreeNode *tmp = cur->next;
             cur->size += tmp->size;
             cur->next = tmp->next;
@@ -91,7 +90,8 @@ int init_alloc(void) {
         // already initialized
         return 0;
     }
-    page_base = mmap(NULL, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    page_base = mmap(NULL, PAGE_SIZE, PROT_READ | PROT_WRITE,
+                     MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
     if (page_base == MAP_FAILED) {
         perror("mmap");
         page_base = NULL;
@@ -132,7 +132,6 @@ int cleanup_alloc(void) {
 
     if (munmap(page_base, PAGE_SIZE) != 0) {
         perror("munmap");
-        // still clear pointer
         page_base = NULL;
         return -1;
     }
@@ -161,7 +160,6 @@ char *alloc_mem(int size) {
                 // exact consume
                 remove_free_node(prev, cur);
             } else {
-                // shrink current free node
                 cur->offset += size;
                 cur->size -= size;
             }

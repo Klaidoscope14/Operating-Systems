@@ -1,4 +1,4 @@
-#define _POSIX_C_SOURCE 200112L
+// ealloc.c
 #include "ealloc.h"
 #include <sys/mman.h>
 #include <unistd.h>
@@ -6,22 +6,29 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define PAGE_SIZE 4096
-#define MAX_PAGES 16   // safe upper cap; lab example mentions up to 4 pages but code supports more
+/* macOS uses MAP_ANON instead of MAP_ANONYMOUS; make it portable */
+#ifndef MAP_ANONYMOUS
+#define MAP_ANONYMOUS MAP_ANON
+#endif
 
+#define PAGE_SIZE 4096
+#define MAX_PAGES 16   /* configurable cap */
+
+/* free node inside a page */
 typedef struct FreeNode {
     size_t offset;
     size_t size;
     struct FreeNode *next;
 } FreeNode;
 
+/* page descriptor */
 typedef struct PageDesc {
-    char *base;          // mmap'd page base
-    FreeNode *free_list; // free blocks inside this page
+    char *base;          /* mmap'd page base */
+    FreeNode *free_list; /* free blocks inside this page */
     struct PageDesc *next;
 } PageDesc;
 
-/* Track which allocation belongs to which page */
+/* allocation record */
 typedef struct AllocRec {
     char *ptr;
     size_t size;
@@ -44,12 +51,16 @@ static void add_free_in_page(PageDesc *p, size_t offset, size_t size) {
     FreeNode **pp = &p->free_list;
     while (*pp && (*pp)->offset < offset) pp = &(*pp)->next;
     FreeNode *node = (FreeNode*)malloc(sizeof(FreeNode));
-    if (!node) return;
+    if (!node) {
+        perror("malloc");
+        return;
+    }
     node->offset = offset;
     node->size = size;
     node->next = *pp;
     *pp = node;
-    // coalesce within page
+
+    /* coalesce adjacent free nodes */
     FreeNode *cur = p->free_list;
     while (cur && cur->next) {
         if (cur->offset + cur->size == cur->next->offset) {
@@ -65,9 +76,13 @@ static PageDesc* create_new_page(void) {
     if (num_pages >= MAX_PAGES) return NULL;
     char *base = mmap(NULL, PAGE_SIZE, PROT_READ | PROT_WRITE,
                       MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-    if (base == MAP_FAILED) return NULL;
+    if (base == MAP_FAILED) {
+        perror("mmap");
+        return NULL;
+    }
     PageDesc *p = (PageDesc*)malloc(sizeof(PageDesc));
     if (!p) {
+        perror("malloc");
         munmap(base, PAGE_SIZE);
         return NULL;
     }
@@ -75,7 +90,6 @@ static PageDesc* create_new_page(void) {
     p->free_list = NULL;
     p->next = pages;
     pages = p;
-    // initial free block = entire page
     add_free_in_page(p, 0, PAGE_SIZE);
     num_pages++;
     return p;
@@ -97,11 +111,9 @@ static AllocRec* find_allocrec(char *ptr, AllocRec **prev_out) {
 
 char *ealloc_mem(int size) {
     if (size <= 0) return NULL;
-    // per lab: sizes multiples of 256; enforce it (optional)
-    if (size % 256 != 0) return NULL;
-    if (size > PAGE_SIZE) return NULL;
+    if (size % 256 != 0) return NULL; /* per lab: multiples of 256 */
+    if ((size_t)size > PAGE_SIZE) return NULL;
 
-    // search pages for a free block
     PageDesc *p = pages;
     while (p) {
         FreeNode *prev = NULL;
@@ -110,7 +122,6 @@ char *ealloc_mem(int size) {
             if (cur->size >= (size_t)size) {
                 size_t off = cur->offset;
                 if (cur->size == (size_t)size) {
-                    // remove node
                     if (prev) prev->next = cur->next;
                     else p->free_list = cur->next;
                     free(cur);
@@ -118,10 +129,9 @@ char *ealloc_mem(int size) {
                     cur->offset += size;
                     cur->size -= size;
                 }
-                // record alloc
                 AllocRec *ar = (AllocRec*)malloc(sizeof(AllocRec));
                 if (!ar) {
-                    // rollback: add free back
+                    perror("malloc");
                     add_free_in_page(p, off, size);
                     return NULL;
                 }
@@ -138,15 +148,13 @@ char *ealloc_mem(int size) {
         p = p->next;
     }
 
-    // no existing page had space -> create new page on demand
+    /* create a new page on demand */
     PageDesc *newp = create_new_page();
     if (!newp) return NULL;
-    // allocate from start of new page
     FreeNode *f = newp->free_list;
-    if (!f || f->size < (size_t)size) return NULL; // should not happen
+    if (!f || f->size < (size_t)size) return NULL;
     size_t off = f->offset;
     if (f->size == (size_t)size) {
-        // remove f
         FreeNode *tmp = f;
         newp->free_list = f->next;
         free(tmp);
@@ -156,6 +164,7 @@ char *ealloc_mem(int size) {
     }
     AllocRec *ar = (AllocRec*)malloc(sizeof(AllocRec));
     if (!ar) {
+        perror("malloc");
         add_free_in_page(newp, off, size);
         return NULL;
     }
@@ -175,16 +184,13 @@ void edealloc_mem(char *ptr) {
     PageDesc *p = found->page;
     size_t off = (size_t)(found->ptr - p->base);
     size_t size = found->size;
-    // remove alloc record
     if (prev) prev->next = found->next;
     else allocs = found->next;
     free(found);
-    // add free in that page and coalesce
     add_free_in_page(p, off, size);
 }
 
 int ecleanup_alloc(void) {
-    // free metadata structures (but do not unmap pages per lab spec)
     AllocRec *ar = allocs;
     while (ar) {
         AllocRec *t = ar;
@@ -192,7 +198,7 @@ int ecleanup_alloc(void) {
         free(t);
     }
     allocs = NULL;
-    // free free_list nodes and page descriptors (but leave pages mapped)
+
     PageDesc *p = pages;
     while (p) {
         FreeNode *fn = p->free_list;
@@ -201,10 +207,11 @@ int ecleanup_alloc(void) {
             fn = fn->next;
             free(t);
         }
-        PageDesc *tpage = p;
+        PageDesc *tp = p;
         p = p->next;
-        // free the PageDesc (but not the mapped memory)
-        free(tpage);
+        /* We keep mmap'd pages per assignment note. If you want to unmap them,
+           call munmap(tp->base, PAGE_SIZE) here before free(tp). */
+        free(tp);
     }
     pages = NULL;
     num_pages = 0;
